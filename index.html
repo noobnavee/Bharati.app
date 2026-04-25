@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Bharati App 🇮🇳</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Poppins&display=swap" rel="stylesheet">
 
   <style>
@@ -19,7 +20,6 @@
       font-size: 28px;
       color: gold;
       border-bottom: 1px solid rgba(255,215,0,0.3);
-      letter-spacing: 2px;
     }
 
     .container {
@@ -28,7 +28,7 @@
       padding: 20px;
     }
 
-    textarea, input {
+    input, textarea {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
@@ -36,12 +36,6 @@
       border: 1px solid rgba(255,215,0,0.3);
       color: #f5e6c8;
       border-radius: 8px;
-    }
-
-    textarea:focus, input:focus {
-      outline: none;
-      border-color: gold;
-      box-shadow: 0 0 10px rgba(255,215,0,0.3);
     }
 
     button {
@@ -53,20 +47,6 @@
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(255,215,0,0.5);
-    }
-
-    .feed-title {
-      margin-top: 30px;
-      font-family: 'Playfair Display', serif;
-      color: gold;
-      border-bottom: 1px solid rgba(255,215,0,0.2);
-      padding-bottom: 5px;
     }
 
     .post {
@@ -75,25 +55,24 @@
       background: #111;
       border-radius: 10px;
       border: 1px solid rgba(255,215,0,0.15);
-      transition: 0.3s;
     }
 
-    .post:hover {
-      border-color: gold;
-      transform: translateY(-3px);
+    .username {
+      font-weight: bold;
+      color: gold;
     }
 
     .category {
       font-size: 12px;
       color: #c9a44c;
-      margin-top: 5px;
     }
 
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 12px;
-      color: #888;
+    .profile-box {
+      background: #111;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,215,0,0.2);
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -104,27 +83,70 @@
 
 <div class="container">
 
+  <!-- PROFILE SETUP -->
+  <div class="profile-box">
+    <h3>Your Profile</h3>
+    <input id="username" placeholder="Enter your name" />
+    <button onclick="saveProfile()">Save Profile</button>
+    <p id="currentUser"></p>
+  </div>
+
+  <!-- CREATE POST -->
   <h3>Share Knowledge</h3>
-
   <textarea id="content" placeholder="Write your insight..."></textarea>
-  <input id="category" placeholder="Category (Vedanta, Yoga, Ayurveda)" />
-
+  <input id="category" placeholder="Category (Vedanta, Yoga)" />
   <button onclick="createPost()">Publish</button>
 
-  <h2 class="feed-title">ज्ञान Feed</h2>
+  <h2>ज्ञान Feed</h2>
   <div id="feed"></div>
 
 </div>
 
-<footer>Dharmic Knowledge • Built for Bharat 🇮🇳</footer>
-
 <script>
+  function getUser() {
+    return localStorage.getItem("username");
+  }
+
+  function saveProfile() {
+    const username = document.getElementById("username").value;
+    localStorage.setItem("username", username);
+    showUser();
+  }
+
+  function showUser() {
+    const user = getUser();
+    document.getElementById("currentUser").innerText =
+      user ? "Logged in as: " + user : "No user set";
+  }
+
   function getPosts() {
     return JSON.parse(localStorage.getItem("posts") || "[]");
   }
 
   function savePosts(posts) {
     localStorage.setItem("posts", JSON.stringify(posts));
+  }
+
+  function createPost() {
+    const content = document.getElementById("content").value;
+    const category = document.getElementById("category").value;
+    const user = getUser();
+
+    if (!user) {
+      alert("Set your profile first");
+      return;
+    }
+
+    const posts = getPosts();
+    posts.push({
+      username: user,
+      content,
+      category
+    });
+
+    savePosts(posts);
+    document.getElementById("content").value = "";
+    renderPosts();
   }
 
   function renderPosts() {
@@ -136,6 +158,7 @@
       const div = document.createElement("div");
       div.className = "post";
       div.innerHTML = `
+        <div class="username">${p.username}</div>
         <div>${p.content}</div>
         <div class="category">${p.category}</div>
       `;
@@ -143,20 +166,7 @@
     });
   }
 
-  function createPost() {
-    const content = document.getElementById("content").value;
-    const category = document.getElementById("category").value;
-
-    if (!content) return;
-
-    const posts = getPosts();
-    posts.push({ content, category });
-
-    savePosts(posts);
-    document.getElementById("content").value = "";
-    renderPosts();
-  }
-
+  showUser();
   renderPosts();
 </script>
 
