@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bharati App 🇮🇳</title>
+  <style>
+    body { font-family: Arial; padding: 40px; }
+    textarea { width: 300px; height: 80px; }
+    .post { border-bottom: 1px solid #ccc; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+<h1>🇮🇳 Bharati App</h1>
+
+<h3>Share Knowledge</h3>
+<textarea id="content" placeholder="Write something..."></textarea><br>
+<input id="category" placeholder="Category (Vedanta, Yoga)" /><br>
+<button onclick="createPost()">Post</button>
+
+<h2>Feed</h2>
+<div id="feed"></div>
+
+<script>
+  function getPosts() {
+    return JSON.parse(localStorage.getItem("posts") || "[]");
+  }
+
+  function savePosts(posts) {
+    localStorage.setItem("posts", JSON.stringify(posts));
+  }
+
+  function renderPosts() {
+    const posts = getPosts().reverse();
+    const feed = document.getElementById("feed");
+    feed.innerHTML = "";
+
+    posts.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "post";
+      div.innerHTML = "<p>" + p.content + "</p><small>" + p.category + "</small>";
+      feed.appendChild(div);
+    });
+  }
+
+  function createPost() {
+    const content = document.getElementById("content").value;
+    const category = document.getElementById("category").value;
+
+    const posts = getPosts();
+    posts.push({
+      content,
+      category,
+      createdAt: new Date()
+    });
+
+    savePosts(posts);
+    document.getElementById("content").value = "";
+    renderPosts();
+  }
+
+  renderPosts();
+</script>
+
+</body>
+</html>
