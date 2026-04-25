@@ -139,6 +139,7 @@
 
     const posts = getPosts();
     posts.push({
+      id: Date.now(),   // added ID
       username: user,
       content,
       category
@@ -149,19 +150,35 @@
     renderPosts();
   }
 
+  function deletePost(id) {
+    let posts = getPosts();
+    posts = posts.filter(p => p.id !== id);
+    savePosts(posts);
+    renderPosts();
+  }
+
   function renderPosts() {
     const posts = getPosts().reverse();
     const feed = document.getElementById("feed");
+    const currentUser = getUser();
+
     feed.innerHTML = "";
 
     posts.forEach(p => {
       const div = document.createElement("div");
       div.className = "post";
+
       div.innerHTML = `
         <div class="username">${p.username}</div>
         <div>${p.content}</div>
         <div class="category">${p.category}</div>
+        ${
+          p.username === currentUser
+            ? `<button onclick="deletePost(${p.id})" style="margin-top:8px;background:red;color:white;">Delete</button>`
+            : ""
+        }
       `;
+
       feed.appendChild(div);
     });
   }
